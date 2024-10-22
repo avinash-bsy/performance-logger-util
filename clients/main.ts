@@ -4,6 +4,7 @@ import {ClashDetectionManager as RestClientManager} from "../clients/rest-client
 import {ClashDetectionManager as WsgManager} from "../clients/wsg-client/ClashDetectionManager";
 
 let clashTest: any;
+let clashTest2: any;
 let resultId: string = "001fba17-bb25-40fb-b6c3-571f22e4bb0f";
 let suppressionRule: SuppressionRuleAndMetadata;
 const suppressionPayload = {
@@ -95,6 +96,7 @@ export class LogTimeDifference {
         if(rcResponse)
         {
             clashTest = rcResponse[0];
+            clashTest2 = rcResponse[1];
         }
     }
 
@@ -203,6 +205,9 @@ export class LogTimeDifference {
         const params = [
             { iModelId : this.iModelId, changesetId, configurationId: clashTest.id }
         ];
+        const params2 = [
+            { iModelId : this.iModelId, changesetId, configurationId: clashTest2.id }
+        ]
         const additionalHeaders = { "In-Place": "force" };
 
         // console.time("runClashTest - RC");
@@ -210,7 +215,7 @@ export class LogTimeDifference {
             await executeWithOrder(
                 "runClashTest",
                 async () => this._restClientManager.runTest_V3(params, "force"),
-                async () => this._wsgManager.runTest_V3(params, additionalHeaders)
+                async () => this._wsgManager.runTest_V3(params2, additionalHeaders)
             );
         } catch(error)
         {
