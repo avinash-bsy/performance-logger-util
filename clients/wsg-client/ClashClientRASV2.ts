@@ -201,10 +201,22 @@ export class ClashClientRASV2 {
     return parsedResults;
   }
 
+  private getResultsQueryString(configIds?: string[]): string {
+    const queryString = new URLSearchParams();
+
+    if (configIds) {
+      queryString.append("configIds", configIds.join(","));
+    }
+
+    const queryStringResult = queryString.toString();
+    return queryStringResult ? `?${queryStringResult}` : "";
+  }
+
   public async getClashResultsMetadataByProject(
     accessToken: string,
     contextId: string,
-    iModelId: string
+    iModelId: string,
+    configIds?: string[]
   ) {
     
     const url = await this.getUrl();
@@ -224,12 +236,13 @@ export class ClashClientRASV2 {
     };
     let rows: any[] = [];
     let hasMoreData = true;
+    const urlWithFilter =  `${url}/v2/results${this.getResultsQueryString(configIds)}`;
     while (hasMoreData) {
       let currentRows: any[] = [];
       try {
         /* eslint-disable-next-line @itwin/no-internal */
         const clashApiResponse = await request(
-          url + "/v2/results",
+          urlWithFilter,
           requestOptions
         );
         /* eslint-disable-next-line @itwin/no-internal */
@@ -404,6 +417,31 @@ export class ClashClientRASV2 {
       postBody,
       httpMethod
     );
+  }
+
+  public async deleteResults(
+    accessToken: string,
+    iTwinId: string,
+    iModelId: string,
+    resultIds: string[]
+  ) {
+    const headers: Record<string, string | number | boolean> = {
+      "Content-Type": "application/json", // eslint-disable-line @typescript-eslint/naming-convention
+      "itwin-id": iTwinId,
+      Authorization: accessToken
+    };
+    if (iModelId)
+      headers["repository-id"] = iModelId;
+    
+    const url = (await this.getUrl()) + `/V2/results`;
+    const options = {
+      method: "PATCH",
+      headers,
+      timeout: this._timeout,
+      body: JSON.stringify(resultIds)
+    }
+    const response = await request(url, options);
+    console.log(response);
   }
 
   // TODO: convert into a custom hook when Results Analysis Service

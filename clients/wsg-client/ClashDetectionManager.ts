@@ -317,7 +317,8 @@ export class ClashDetectionManager {
     const response = await this._clientRMS.deleteClashTests(
       this._accessToken,
       this.projectId,
-      testIds
+      testIds,
+      this.iModelId
     );
     return response;
   }
@@ -440,7 +441,7 @@ export class ClashDetectionManager {
     {
       const testIds = res.status.map((t:any) => t.id);
       console.time("BulkDelete - WSG")
-      await this._clientRMS.deleteClashTests(this._accessToken, this.projectId, testIds);
+      await this._clientRMS.deleteClashTests(this._accessToken, this.projectId, testIds, this.iModelId);
       console.timeEnd("BulkDelete - WSG")
     }
   }

@@ -4,16 +4,17 @@ import {
   type RequestTimeoutOptions,
   type Response,
   request,
-  ResponseError,
 } from "@bentley/wsg-client";
-import type { AccessToken } from "@itwin/core-bentley";
+import { ClashClientRASV2 } from "./ClashClientRASV2";
 
 export class ClashClientRMS {
   private _timeout: RequestTimeoutOptions = {
     deadline: 60000,
     response: 60000,
   }; // 1 min
+  private _rasClient: ClashClientRASV2;
   constructor() {
+    this._rasClient = new ClashClientRASV2();
   }
 
   private _url = `https://${
@@ -235,8 +236,20 @@ export class ClashClientRMS {
   public async deleteClashTests(
     accessToken: string,
     projectId: string,
-    testGuids: string[]
+    testGuids: string[],
+    iModelId: string
   ): Promise<boolean> {
+    const results = await this._rasClient.getClashResultsMetadataByProject(accessToken, projectId, iModelId, testGuids);
+    let resultIds: string[] = [];
+    results?.forEach(element => {
+      resultIds.push(element.id);
+    });
+
+    if(resultIds.length > 0)
+    {
+      this._rasClient.deleteResults(accessToken, projectId, iModelId, resultIds);
+    }
+
     const url = (await this.getUrl()) + `/v3/contexts/${projectId}/tests`;
     const result = await this.httpRequest(
       accessToken,

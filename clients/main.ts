@@ -33,12 +33,15 @@ async function executeWithOrder(opertaionTitle: string, rcFunction: any, wsgFunc
         console.time(`${opertaionTitle} - RC`);
         rcResponse = await rcFunction();
         console.timeEnd(`${opertaionTitle} - RC`);
+        setTimeout(async () => {
+            if (callWsg) {
+                console.time(`${opertaionTitle} - WSG`);
+                wsgResponse = await wsgFunction();
+                console.timeEnd(`${opertaionTitle} - WSG`);
+            }
+        }, 60*1000)
         
-        if (callWsg) {
-            console.time(`${opertaionTitle} - WSG`);
-            wsgResponse = await wsgFunction();
-            console.timeEnd(`${opertaionTitle} - WSG`);
-        }
+        
     } else if (callWsg && !callRCFirst) {
         console.time(`${opertaionTitle} - WSG`);
         wsgResponse = await wsgFunction();
@@ -85,7 +88,8 @@ export class LogTimeDifference {
     }
 
     private async getClashTests() {
-        const {rcResponse, wsgResponse} = await executeWithOrder("getClashTests", async () => this._restClientManager.getClashTestMetadata_V3(), async () => this._wsgManager.getClashTestMetadata_V3());
+        const {rcResponse, wsgResponse} = await executeWithOrder("getClashTests", async () => this._restClientManager.getClashTestMetadata_V3(), async () => {});
+        console.log(rcResponse);
         if(rcResponse)
         {
             clashTest = rcResponse[0];
@@ -94,7 +98,7 @@ export class LogTimeDifference {
     }
 
     private async getClashTestById() {
-        const {rcResponse} = await executeWithOrder("getClashTestById", async () => this._restClientManager.getClashTestById(clashTest.id), async () => this._wsgManager.getClashTestById(clashTest.id));
+        const {rcResponse} = await executeWithOrder("getClashTestById", async () => this._restClientManager.getClashTestById(clashTest.id), async () => this._wsgManager.getClashTestById(clashTest2.id));
 
         if(rcResponse)
         {
@@ -177,7 +181,7 @@ export class LogTimeDifference {
     }
 
     private async getClashResults() {
-        await executeWithOrder("getClashResults", async () => this._restClientManager.getClashResults(resultId), async () => this._wsgManager.getClashResults(resultId));
+        await executeWithOrder("getClashResults", async () => this._restClientManager.getClashResults(resultId), () => {});
 
     }
 
@@ -254,21 +258,21 @@ export class LogTimeDifference {
     }
 
     public async init() {
-        await this.getClashTests();
-        await this.getClashTestById();
-        await this.editClashTest();
-        await this.copyClashTest();
-        await this.importClashTests();
-        await this.createClashTests();
-        await this.deleteClashTest();
-        await this.runClashTest();
+        // await this.getClashTests();
+        // await this.getClashTestById();
+        // await this.editClashTest();
+        // await this.copyClashTest();
+        // await this.importClashTests();
+        // await this.createClashTests();
+        // await this.deleteClashTest();
+        // await this.runClashTest();
         await this.getClashResults();
-        await this.getSuppressionRuleTemplates();
-        await this.getSuppressionRules();
-        await this.getSuppressionRuleById();
-        await this.addSuppressionRule();
-        await this.updateSuppressionRule();
-        await this.deleteSuppressionRule();
-        await this.bulkCreateAndDeleteTests();
+        // await this.getSuppressionRuleTemplates();
+        // await this.getSuppressionRules();
+        // await this.getSuppressionRuleById();
+        // await this.addSuppressionRule();
+        // await this.updateSuppressionRule();
+        // await this.deleteSuppressionRule();
+        // await this.bulkCreateAndDeleteTests();
     }
 }

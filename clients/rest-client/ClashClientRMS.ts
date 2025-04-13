@@ -82,7 +82,7 @@ export class ClashClientRMS {
         iTwinId: projectId,
         includeRulesCount: true,
         pageSize: this.RMS_DEFAULT_PAGE_SIZE,
-        iModelId,
+        iModelId
       })) {
         for (const row of clashTests) {
           const updatedTestData = this.toClashTestStructure(row, projectId);

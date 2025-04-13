@@ -55,6 +55,12 @@ export class ClashDetectionManager {
         }
       }
     }
+    console.log(JSON.stringify({
+      id: results?.id,
+    clashes: [results?.clashes[0]],
+    calculateOverlap: results?.calculateOverlap,
+    status: results?.status,
+    }));
     return results;
   }
 
